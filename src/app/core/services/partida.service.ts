@@ -155,6 +155,21 @@ export class PartidaService {
       );
   }
 
+  sincronizarJugador(partidaId: number): Observable<any> {
+    if (!partidaId || isNaN(partidaId)) {
+      return throwError(() => new Error('ID de partida inválido'));
+    }
+
+    return this.http
+      .get<any>(`${this.apiUrl}/juego/${partidaId}/sync`)
+      .pipe(
+        catchError((error) => {
+          console.error('Error al sincronizar jugador:', error);
+          return throwError(() => error);
+        })
+      );
+  }
+
   obtenerUltimosDatos(partidaId: number): Observable<ultimosDatosResponse> {
     if (!partidaId || isNaN(partidaId)) {
       return throwError(() => new Error('ID de partida inválido'));

@@ -39,33 +39,68 @@ export class JuegoUsuarioComponent implements OnInit, OnDestroy {
 
 
   iniciarPolling(): void {
-    this.pollingSubscription = interval(3000).subscribe(() => {
-      this.partidaService.obtenerUltimosDatos(this.partidaId).subscribe({
+    this.pollingSubscription = interval(2000).subscribe(() => {
+      this.partidaService.sincronizarJugador(this.partidaId).subscribe({
         next: (response) => {
-          this.ultimaCarta = response.ultimaCarta;
-
-
-          if(response.yaHayGanador) {
-            this.esGanador = response.tuEresElGanador;
-            this.mensajeResultado = this.esGanador ? '¡Felicidades! ¡Has ganado!' : 'Te equivocaste en algunas posiciones!';
-
-            if (this.pollingSubscription) {
-              this.pollingSubscription.unsubscribe();
-            }
-
-            if(!this.esGanador){
+          if (response.success) {
+            this.ultimaCarta = response.partida.cartaActual;
+            
+            // Actualizar fichas del jugador
+            this.posicionesMarcadas = response.jugador.fichas || [];
+            
+            // Verificar si hay ganador
+            if (response.partida.estado === 'finalizado' && response.partida.ganadorId) {
+              this.esGanador = response.partida.ganadorId === this.obtenerUserId();
+              this.mensajeResultado = this.esGanador ? '¡Felicidades! ¡Has ganado!' : 'Alguien más ganó la partida';
+              
+              if (this.pollingSubscription) {
+                this.pollingSubscription.unsubscribe();
+              }
+              
+              // Mostrar resultado
               setTimeout(() => {
-                alert(this.mensajeResultado)
-                this.router.navigate(['/app/home'])
-              }, 3000)
+                alert(this.mensajeResultado);
+                this.router.navigate(['/app/home']);
+              }, 2000);
             }
           }
         },
         error: (error) => {
-          console.error('Error al obtener ultimos datos:', error);
+          console.error('Error al sincronizar datos:', error);
+          // Fallback al método anterior si la sincronización falla
+          this.partidaService.obtenerUltimosDatos(this.partidaId).subscribe({
+            next: (response) => {
+              this.ultimaCarta = response.ultimaCarta;
+              
+              if(response.yaHayGanador) {
+                this.esGanador = response.tuEresElGanador;
+                this.mensajeResultado = this.esGanador ? '¡Felicidades! ¡Has ganado!' : 'Te equivocaste en algunas posiciones!';
+                
+                if (this.pollingSubscription) {
+                  this.pollingSubscription.unsubscribe();
+                }
+                
+                if(!this.esGanador){
+                  setTimeout(() => {
+                    alert(this.mensajeResultado)
+                    this.router.navigate(['/app/home'])
+                  }, 3000)
+                }
+              }
+            },
+            error: (error) => {
+              console.error('Error al obtener ultimos datos:', error);
+            },
+          });
         },
-      })
-    })
+      });
+    });
+  }
+
+  obtenerUserId(): number {
+    // Esta función debería obtener el ID del usuario actual
+    // Por ahora retornamos 0, pero debería implementarse correctamente
+    return 0;
   }
 
   ngOnDestroy(): void {
@@ -96,7 +131,7 @@ export class JuegoUsuarioComponent implements OnInit, OnDestroy {
 
     this.partidaService.colocarFicha(this.partidaId, posicion).subscribe({
       next: (response) => {
-        this.posicionesMarcadas.push(posicion);
+        this.posicionesMarcadas = response.fichas; // Usar la respuesta del servidor
 
         if (this.posicionesMarcadas.length === this.maxFichas) {
           this.validarCarta();
@@ -104,6 +139,7 @@ export class JuegoUsuarioComponent implements OnInit, OnDestroy {
       },
       error: (error) => {
         console.error('Error al colocar ficha:', error);
+        alert('No puedes colocar ficha en esa posición. La carta no ha sido gritada.');
       },
     });
   }
