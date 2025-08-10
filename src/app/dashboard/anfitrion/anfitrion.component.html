@@ -1,0 +1,84 @@
+<div *ngIf="isLoading" class="flex justify-center items-center py-8">
+  <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+  <span class="ml-2 text-gray-600">Cargando partida...</span>
+</div>
+
+<div *ngIf="errorMsg" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+  {{ errorMsg }}
+</div>
+
+<div *ngIf="partida && !isLoading" class="max-w-7xl mx-auto px-4">
+  <div class="bg-white rounded-lg shadow-sm p-4 mb-4">
+    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+      <div>
+        <h2 class="text-xl font-bold text-gray-800">{{ partida.nombre }}</h2>
+        <p class="text-sm text-gray-600">Estado: <span class="font-medium capitalize">{{ partida.estado }}</span></p>
+      </div>
+      
+      <button
+        class="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-400 text-white font-medium py-2 px-4 rounded-lg transition-all duration-200 transform hover:scale-105 disabled:transform-none"
+        (click)="sacarCarta()"
+        [disabled]="(mazoRestante || []).length === 0"
+      >
+        Sacar Carta <span class="text-xs">({{ (mazoRestante || []).length }} restantes)</span>
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="cartaActual" class="mb-6">
+    <div class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-4">
+      <h3 class="text-lg font-bold text-gray-800 mb-3 text-center">
+        Última carta sacada
+      </h3>
+      <div class="flex justify-center">
+        <div class="relative">
+          <img
+            [src]="'/cartas/' + cartaActual + '.jpg'"
+            [alt]="'Carta ' + cartaActual"
+            class="w-32 h-48 object-cover rounded-lg shadow-lg border-2 border-white transform hover:scale-105 transition-transform duration-300"
+            (error)="onImageError($event)"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="partida && partida.usuarios" class="bg-white rounded-lg shadow-sm p-4">
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-lg font-bold text-gray-800">Jugadores</h2>
+      <span class="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
+        {{ partida.usuarios.length }} participantes
+      </span>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+      <div
+        *ngFor="let usuario of partida.usuarios; trackBy: trackByUsuarioId"
+        class="bg-gray-50 rounded-lg p-3 hover:bg-gray-100 transition-colors"
+        [class.ring-2]="partida.ganadorId === usuario.id"
+        [class.ring-green-400]="partida.ganadorId === usuario.id"
+        [class.bg-green-50]="partida.ganadorId === usuario.id"
+      >
+        <div class="flex items-center justify-between mb-2">
+          <h3 class="text-sm font-semibold text-gray-700 truncate flex-1">
+            {{ usuario.fullName }}
+          </h3>
+          
+          <div *ngIf="partida.ganadorId === usuario.id" 
+               class="ml-2 text-green-600 text-lg" 
+               title="Ganador">
+            🏆
+          </div>
+        </div>
+
+        <div class="transform scale-90 origin-top-left">
+          <app-carta
+            [numeros]="usuario.cartas"
+            [fichas]="usuario.fichas"
+            [modoSoloLectura]="true"
+          ></app-carta>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

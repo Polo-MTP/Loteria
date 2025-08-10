@@ -1,0 +1,69 @@
+<div *ngIf="loading">Cargando lista de partidas...</div>
+<div *ngIf="errorMsg">{{ errorMsg }}</div>
+
+<div *ngIf="!loading">
+  <h2>Lista de Partidas</h2>
+  <div *ngIf="partidas.length === 0" class="text-center">
+    <p>No hay partidas disponibles.</p>
+  </div>
+  <div *ngIf="partidas.length > 0" class="overflow-x-auto">
+    <table class="min-w-full bg-white shadow-lg rounded-lg overflow-hidden">
+      <thead class="bg-gray-50">
+        <tr>
+          <th
+            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+          >
+            Nombre de la Partida
+          </th>
+          <th
+            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+          >
+            Anfitrión
+          </th>
+          <th
+            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+          >
+            Estado
+          </th>
+          <th
+            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+          >
+            Acciones
+          </th>
+        </tr>
+      </thead>
+      <tbody class="bg-white divide-y divide-gray-200">
+        <tr *ngFor="let partida of partidas" class="hover:bg-gray-50">
+          <td class="px-6 py-4 whitespace-nowrap">
+            <div class="text-sm font-medium text-gray-900">
+              {{ partida.nombre }}
+            </div>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <div class="text-sm text-gray-900">
+              {{ partida.anfitrion.fullName }}
+            </div>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <div class="flex items-center">
+              <span class="text-sm font-medium text-gray-700">
+                {{ partida.estado }}
+              </span>
+            </div>
+          </td>
+          <td
+            class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"
+          >
+            <button
+              *ngIf="partida.estado === 'en_curso'"
+              (click)="unirsePartida(partida.id)"
+              class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-6 rounded-lg transition-colors duration-200 transform hover:scale-105"
+            >
+              Unirse
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

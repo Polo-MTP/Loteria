@@ -1,0 +1,18 @@
+<div class="grid grid-cols-4 gap-2 p-2">
+  <div
+    *ngFor="let id of numeros; let i = index"
+    (click)="onclick(i)"
+    class="relative w-full h-full bg-gray-200 rounded-lg border border-gray-300 flex justify-center items-center cursor-pointer"
+    [class.pointer-events-none]="modoSoloLectura"
+  >
+    <img
+      [src]="obtenerRuta(id)"
+      alt="Carta"
+      class="w-full h-full object-cover"
+    />
+    <div
+      *ngIf="tieneFicha(i)"
+      class="absolute top-1 right-1 w-5 h-5 bg-red-600 rounded-full border-2 border-white shadow-md"
+    ></div>
+  </div>
+</div>

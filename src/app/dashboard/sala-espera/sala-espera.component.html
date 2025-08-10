@@ -1,0 +1,154 @@
+<div class="relative min-h-screen bg-gradient-to-br from-yellow-200 via-orange-200 to-red-200 overflow-hidden">
+  <!-- Patrones decorativos de fondo -->
+  <div class="absolute inset-0 opacity-10">
+    <div class="absolute inset-0 bg-wave-pattern"></div>
+  </div>
+  
+  <div class="absolute inset-0 opacity-5">
+    <div class="grid-pattern"></div>
+  </div>
+
+  <!-- Contenido principal -->
+  <div class="relative z-10 flex items-center justify-center min-h-screen p-6">
+    <div class="max-w-2xl w-full">
+      
+      <!-- Flash Message -->
+      <div *ngIf="flash.success" class="mb-6">
+        <div class="bg-green-600/20 backdrop-blur-sm border border-green-400/30 rounded-2xl p-4 shadow-2xl">
+          <div class="flex items-center text-green-200">
+            <svg class="w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+            </svg>
+            {{ flash.success }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Card principal -->
+      <div class="bg-green-800/30 backdrop-blur-sm rounded-3xl p-8 border border-green-600/30 shadow-2xl text-center">
+        
+        <!-- Header con icono de jugador -->
+        <div class="mb-8">
+          <div class="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center shadow-xl animate-bounce">
+            <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+            </svg>
+          </div>
+          
+          <h1 class="text-3xl md:text-4xl font-bold text-white mb-4">
+            <span class="bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent">
+              🎲 Jugador en Espera
+            </span>
+          </h1>
+        </div>
+
+        <!-- Información de la partida -->
+        <div *ngIf="partida" class="mb-8">
+          <div class="bg-blue-600/20 backdrop-blur-sm rounded-2xl p-6 border border-blue-500/30">
+            <h2 class="text-2xl font-bold text-white mb-2">
+              🎪 {{ partida.nombre }}
+            </h2>
+            <p class="text-orange-200">Te has unido exitosamente a la mesa</p>
+          </div>
+        </div>
+
+        <!-- Loading State -->
+        <div *ngIf="loading" class="py-8">
+          <div class="flex justify-center mb-6">
+            <svg class="animate-spin h-16 w-16 text-green-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+          </div>
+          <p class="text-xl text-white font-medium">Conectando a la mesa...</p>
+        </div>
+
+        <!-- Estado de espera/listo -->
+        <div *ngIf="!loading" class="space-y-6">
+          
+          <!-- Mensaje de estado con icono dinámico -->
+          <div class="text-center mb-8">
+            <div *ngIf="jugadoresActuales < 2" class="mb-4">
+              <div class="text-4xl mb-4 animate-spin" style="animation-duration: 3s;">🎭</div>
+              <p class="text-xl text-white font-medium mb-2">{{ statusMessage }}</p>
+              <p class="text-orange-200">El anfitrión está preparando las cartas...</p>
+            </div>
+            
+            <div *ngIf="jugadoresActuales >= 2" class="mb-4">
+              <div class="text-4xl mb-4 animate-pulse">🎆</div>
+              <p class="text-xl text-green-300 font-bold mb-2">{{ statusMessage }}</p>
+              <p class="text-orange-200">¡Prepárate para marcar tu tabla!</p>
+            </div>
+          </div>
+
+          <!-- Contador de jugadores con representación visual -->
+          <div class="bg-yellow-600/20 backdrop-blur-sm rounded-2xl p-6 border border-yellow-500/30 mb-6">
+            <div class="flex items-center justify-center space-x-4 mb-4">
+              <!-- Representación visual de sillas en la mesa -->
+              <div class="grid grid-cols-4 gap-2 max-w-xs mx-auto">
+                <div *ngFor="let i of [].constructor(jugadoresActuales)" 
+                     class="w-12 h-12 bg-gradient-to-br from-green-400 to-green-600 rounded-full border-2 border-yellow-300 flex items-center justify-center animate-pulse">
+                  <span class="text-white text-lg">🧑</span>
+                </div>
+                <div *ngFor="let i of [].constructor(maxJugadores - jugadoresActuales)" 
+                     class="w-12 h-12 bg-gray-400/30 rounded-full border-2 border-gray-500/30 flex items-center justify-center">
+                  <span class="text-gray-500 text-lg">🪑</span>
+                </div>
+              </div>
+            </div>
+            
+            <p class="text-white font-bold text-lg mb-2">
+              Mesa: {{ jugadoresActuales }} / {{ maxJugadores }} Asientos Ocupados
+            </p>
+            
+            <!-- Barra de progreso temática -->
+            <div class="w-full bg-gray-700/30 rounded-full h-4 border border-yellow-400/30 relative overflow-hidden">
+              <div class="bg-gradient-to-r from-green-400 to-blue-500 h-4 rounded-full transition-all duration-500 flex items-center justify-end pr-2" 
+                   [style.width.%]="progressPercentage">
+                <span *ngIf="progressPercentage > 25" class="text-xs font-bold text-white">{{ progressPercentage | number:'1.0-0' }}%</span>
+              </div>
+              <!-- Efecto de brillo -->
+              <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse"></div>
+            </div>
+          </div>
+
+          <!-- Consejos para el jugador -->
+          <div class="bg-red-600/20 backdrop-blur-sm rounded-2xl p-6 border border-red-500/30">
+            <h3 class="text-lg font-bold text-white mb-4">🃋 Consejos del Jugador</h3>
+            <div class="space-y-2 text-left text-orange-200">
+              <div class="flex items-start">
+                <span class="text-yellow-400 mr-2">•</span>
+                <span>Mantén atención a las cartas que cante el anfitrión</span>
+              </div>
+              <div class="flex items-start">
+                <span class="text-yellow-400 mr-2">•</span>
+                <span>Marca rápidamente las cartas en tu tabla</span>
+              </div>
+              <div class="flex items-start">
+                <span class="text-yellow-400 mr-2">•</span>
+                <span>Grita "¡Lotería!" cuando completes una línea</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Elementos decorativos flotantes -->
+  <div class="absolute bottom-20 right-10 opacity-20 animate-float hidden lg:block">
+    <div class="w-20 h-20 text-green-400">
+      <svg fill="currentColor" viewBox="0 0 24 24">
+        <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+      </svg>
+    </div>
+  </div>
+  
+  <div class="absolute top-32 left-20 opacity-20 animate-float-delayed hidden lg:block">
+    <div class="w-16 h-16 text-blue-400">
+      <svg fill="currentColor" viewBox="0 0 24 24">
+        <path d="M12 2l3.09 6.26L22 9l-5 4.87L18.18 20 12 16.77 5.82 20 7 13.87 2 9l6.91-.74L12 2z"/>
+      </svg>
+    </div>
+  </div>
+</div>

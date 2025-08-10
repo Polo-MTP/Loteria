@@ -1,0 +1,57 @@
+<div class="p-4 max-w-md mx-auto">
+  <h2 class="text-2xl font-bold text-center">Tu Cartaa</h2>
+
+  <div
+    *ngIf="ultimaCarta !== null"
+    class="mt-4 text-center font-bold text-indigo-600"
+  >
+    <img
+      [src]="'cartas/' + ultimaCarta + '.jpg'"
+      alt="Carta"
+      class="w-32 h-48 object-cover mx-auto rounded-lg shadow-lg"
+    />
+  </div>
+
+  <div
+    *ngIf="mensajeResultado"
+    class="mt-4 p-4 rounded-lg text-center font-bold text-lg"
+    [ngClass]="{
+      'bg-green-100 border-2 border-green-500 text-green-800': esGanador,
+      'bg-red-100 border-2 border-red-500 text-red-800': !esGanador
+    }"
+  >
+    {{ mensajeResultado }}
+  </div>
+
+  <div class="flex gap-4 max-w-md mx-auto">
+    <div class="flex-1">
+      <app-carta
+        [numeros]="carta"
+        [fichas]="posicionesMarcadas"
+        (fichaColocada)="colocarFicha($event)"
+      ></app-carta>
+    </div>
+
+    <div class="w-20 grid grid-cols-2 gap-2 items-start">
+      <img
+        *ngFor="let ficha of ArregloFichasRestantes"
+        src="cartas/default.png"
+        alt="Ficha"
+        class="w-8 h-8"
+      />
+    </div>
+  </div>
+
+  <div class="mt-4 text-center text-sm text-gray-600">
+    Fichas colocadas: {{ posicionesMarcadas.length }}/{{ maxFichas }}
+  </div>
+
+  <div>
+    <button
+      class="bg-red-500 hover:bg-red-600 disabled:bg-gray-400 text-white font-medium py-2 px-4 rounded-lg transition-all duration-200 transform hover:scale-105 disabled:transform-none"
+      (click)="abandonarPartida()"
+    >
+      Abandonar Partida
+    </button>
+  </div>
+</div>

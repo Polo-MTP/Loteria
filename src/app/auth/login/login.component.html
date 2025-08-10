@@ -1,0 +1,142 @@
+<div class="relative h-screen bg-gradient-to-b from-yellow-200 via-orange-200 to-red-200 overflow-hidden">
+  <div class="absolute inset-0 opacity-10">
+    <div class="absolute inset-0 bg-wave-pattern"></div>
+  </div>
+  
+  <div class="absolute inset-0 opacity-5">
+    <div class="grid-pattern"></div>
+  </div>
+
+  <!-- Botón de regreso -->
+  <div class="absolute top-0 left-0 p-6 z-10">
+    <a
+      routerLink="/"
+      class="inline-flex items-center px-4 py-2 bg-slate-600 hover:bg-slate-700 text-white font-semibold rounded-lg shadow-lg transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2"
+    >
+      <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+      </svg>
+      Volver
+    </a>
+  </div>
+
+  <div class="flex items-center justify-center h-full px-6">
+    <div class="max-w-md w-full">
+      <!-- Header con imagen y título -->
+      <div class="text-center mb-8">
+        
+        <h1 class="text-3xl md:text-4xl font-bold text-white mb-3 tracking-tight">
+          <span class="bg-gradient-to-r from-red-600 to-green-600 bg-clip-text text-transparent">
+            Iniciar
+          </span>
+          <br>
+          <span class="bg-gradient-to-r from-yellow-400 to-red-500 bg-clip-text text-transparent">
+            Sesión
+          </span>
+        </h1>
+        
+        <p class="text-lg text-red-600 font-medium mb-6">
+          Entra y juega tu suerte
+        </p>
+      </div>
+
+      <!-- Formulario -->
+      <div class="bg-red-800/30 backdrop-blur-sm rounded-2xl p-8 border border-red-600/30 shadow-2xl">
+        <form
+          class="space-y-6"
+          [formGroup]="loginForm"
+          (ngSubmit)="onSubmit()"
+        >
+          <!-- Email -->
+          <div>
+            <label for="email" class="block text-sm font-medium text-white mb-2">
+              Email
+            </label>
+            <input
+              id="email"
+              formControlName="email"
+              type="email"
+              [class]="
+                'w-full px-4 py-3 bg-white/10 backdrop-blur-sm border rounded-xl text-white placeholder-orange-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200' +
+                (hasFieldError('email') ? ' border-red-400' : ' border-red-600/30')
+              "
+              placeholder="tucorreo@ejemplo.com"
+            />
+            <div *ngIf="hasFieldError('email')" class="text-red-200 text-sm mt-2 flex items-center">
+              <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+              </svg>
+              {{ getFieldError("email") }}
+            </div>
+          </div>
+
+          <!-- Password -->
+          <div>
+            <label for="password" class="block text-sm font-medium text-white mb-2">
+              Contraseña
+            </label>
+            <input
+              id="password"
+              formControlName="password"
+              type="password"
+              [class]="
+                'w-full px-4 py-3 bg-white/10 backdrop-blur-sm border rounded-xl text-white placeholder-orange-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200' +
+                (hasFieldError('password') ? ' border-red-400' : ' border-red-600/30')
+              "
+              placeholder="Tu contraseña"
+            />
+            <div *ngIf="hasFieldError('password')" class="text-red-200 text-sm mt-2 flex items-center">
+              <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+              </svg>
+              {{ getFieldError("password") }}
+            </div>
+          </div>
+
+          <!-- Error general -->
+          <div *ngIf="error" class="bg-red-500/20 border border-red-400 rounded-lg p-3">
+            <div class="flex items-center text-red-200 text-sm">
+              <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+              </svg>
+              {{ error }}
+            </div>
+          </div>
+
+          <!-- Botón de submit -->
+          <div>
+            <button
+              type="submit"
+              [disabled]="!loginForm.valid || loading"
+              class="group relative w-full inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-bold text-base rounded-xl shadow-2xl transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-red-500/50 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+            >
+              <svg *ngIf="loading" class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              <svg *ngIf="!loading" class="w-5 h-5 mr-2 group-hover:rotate-12 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+              </svg>
+              {{ loading ? "Iniciando..." : "Iniciar Sesión" }}
+              <div class="absolute inset-0 rounded-xl bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            </button>
+          </div>
+
+          <!-- Link a registro -->
+          <div class="text-center pt-4">
+            <p class="text-orange-200 text-sm mb-2">¿No tienes cuenta?</p>
+            <a 
+              routerLink="/register" 
+              class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-yellow-600 to-yellow-700 hover:from-yellow-700 hover:to-yellow-800 text-white font-semibold rounded-lg shadow-lg transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2"
+            >
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+              </svg>
+              Regístrate aquí
+            </a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
