@@ -185,4 +185,11 @@ export class JuegoUsuarioComponent implements OnInit, OnDestroy {
   get ArregloFichasRestantes(): number[] {
     return Array(this.fichasRestantes).fill(0)
   }
+
+  onImageError(event: Event): void {
+    const target = event.target as HTMLImageElement;
+    if (target) {
+      target.src = 'cartas/default.png';
+    }
+  }
 }
