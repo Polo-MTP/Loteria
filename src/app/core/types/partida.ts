@@ -139,6 +139,7 @@ export interface ultimosDatosResponse {
 }
 
 export interface salirPartidaResponse {
-  message: string
+  message: string;
+  abandonoVoluntario?: boolean;
 }
 
