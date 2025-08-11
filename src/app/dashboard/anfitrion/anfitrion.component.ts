@@ -155,7 +155,7 @@ export class AnfitrionComponent implements OnInit, OnDestroy {
   finalizarPartidaSinGanador(): void {
     // Llamar al backend para finalizar la partida sin ganador
     this.partidaService.finalizarPartidaSinGanador(this.partidaId).subscribe({
-      next: (response) => {
+      next: (response: any) => {
         if (this.pollingSubscription) {
           this.pollingSubscription.unsubscribe();
         }
@@ -165,7 +165,7 @@ export class AnfitrionComponent implements OnInit, OnDestroy {
           this.router.navigate(['/app/home']);
         }, 2000);
       },
-      error: (error) => {
+      error: (error: any) => {
         console.error('Error al finalizar partida:', error);
       }
     });

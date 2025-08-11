@@ -255,4 +255,51 @@ export class PartidaService {
         })
       );
   }
+
+  finalizarPartidaSinGanador(partidaId: number): Observable<any> {
+    if (!partidaId || isNaN(partidaId)) {
+      return throwError(() => new Error('ID de partida inválido'));
+    }
+
+    return this.http
+      .post<any>(`${this.apiUrl}/partida/${partidaId}/finalizar-sin-ganador`, {})
+      .pipe(
+        catchError((error) => {
+          console.error('Error al finalizar partida sin ganador:', error);
+          return throwError(() => error);
+        })
+      );
+  }
+
+  quitarFicha(partidaId: number, posicion: number): Observable<any> {
+    if (!partidaId || isNaN(partidaId)) {
+      return throwError(() => new Error('ID de partida inválido'));
+    }
+
+    return this.http
+      .delete<any>(`${this.apiUrl}/juego/${partidaId}/ficha`, {
+        body: { posicion }
+      })
+      .pipe(
+        catchError((error) => {
+          console.error('Error al quitar ficha:', error);
+          return throwError(() => error);
+        })
+      );
+  }
+
+  obtenerEstadisticas(partidaId: number): Observable<any> {
+    if (!partidaId || isNaN(partidaId)) {
+      return throwError(() => new Error('ID de partida inválido'));
+    }
+
+    return this.http
+      .get<any>(`${this.apiUrl}/juego/${partidaId}/estadisticas`)
+      .pipe(
+        catchError((error) => {
+          console.error('Error al obtener estadísticas:', error);
+          return throwError(() => error);
+        })
+      );
+  }
 }
