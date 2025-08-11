@@ -69,6 +69,27 @@ export class AnfitrionComponent implements OnInit, OnDestroy {
         this.mazoRestante = this.generarMazoRestante();
         this.isLoading = false;
         this.errorMsg = '';
+        
+        // Verificar si la partida terminó
+        if (this.partida.estado === 'finalizado') {
+          if (this.pollingSubscription) {
+            this.pollingSubscription.unsubscribe();
+          }
+          
+          setTimeout(() => {
+            if (this.partida.ganadorId) {
+              alert('¡Alguien ganó la partida! La partida ha terminado.');
+            } else {
+              alert('La partida ha terminado.');
+            }
+            this.router.navigate(['/app/home']);
+          }, 2000);
+        }
+        
+        // Verificar si se acabaron las cartas sin ganador
+        if (this.mazoRestante.length === 0 && this.partida.estado === 'en_curso') {
+          this.finalizarPartidaSinGanador();
+        }
       },
       error: (error) => {
         this.errorMsg = 'Error cargando la partida';
@@ -129,5 +150,24 @@ export class AnfitrionComponent implements OnInit, OnDestroy {
 
   trackByUsuarioId(index: number, usuario: any): any {
     return usuario.id || index;
+  }
+
+  finalizarPartidaSinGanador(): void {
+    // Llamar al backend para finalizar la partida sin ganador
+    this.partidaService.finalizarPartidaSinGanador(this.partidaId).subscribe({
+      next: (response) => {
+        if (this.pollingSubscription) {
+          this.pollingSubscription.unsubscribe();
+        }
+        
+        setTimeout(() => {
+          alert('Se acabaron las cartas sin ganador. Todos pierden.');
+          this.router.navigate(['/app/home']);
+        }, 2000);
+      },
+      error: (error) => {
+        console.error('Error al finalizar partida:', error);
+      }
+    });
   }
 }

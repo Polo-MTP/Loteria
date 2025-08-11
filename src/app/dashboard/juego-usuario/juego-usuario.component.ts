@@ -50,20 +50,34 @@ export class JuegoUsuarioComponent implements OnInit, OnDestroy {
             // Actualizar fichas del jugador
             this.posicionesMarcadas = response.jugador.fichas || [];
             
-            // Verificar si hay ganador
-            if (response.partida.estado === 'finalizado' && response.partida.ganadorId) {
-              this.esGanador = response.partida.ganadorId === this.obtenerUserId();
-              this.mensajeResultado = this.esGanador ? '¡Felicidades! ¡Has ganado!' : 'Alguien más ganó la partida';
-              
+            // Verificar estado del jugador
+            const estadoJugador = response.jugador.estado || 'jugando';
+            
+            if (estadoJugador === 'eliminado') {
+              this.jugadorEliminado = true;
+              this.puedeJugar = false;
+              this.mensajeResultado = 'Perdiste - Esperando a los demás jugadores';
+            } else if (estadoJugador === 'ganador') {
+              this.esGanador = true;
+              this.puedeJugar = false;
+              this.mensajeResultado = '¡Felicidades! ¡Has ganado la partida!';
+            }
+            
+            // Verificar si la partida terminó
+            if (response.partida.estado === 'finalizado') {
               if (this.pollingSubscription) {
                 this.pollingSubscription.unsubscribe();
               }
               
-              // Mostrar resultado
+              if (!this.mensajeResultado) {
+                this.mensajeResultado = 'La partida ha terminado';
+              }
+              
+              // Mostrar resultado y navegar al home
               setTimeout(() => {
                 alert(this.mensajeResultado);
                 this.router.navigate(['/app/home']);
-              }, 2000);
+              }, 3000);
             }
           }
         },
