@@ -24,15 +24,21 @@
     <p>Esperando que el anfitrión grite la primera carta...</p>
   </div>
 
+  <!-- Mensaje de resultado -->
   <div
     *ngIf="mensajeResultado"
     class="mt-4 p-4 rounded-lg text-center font-bold text-lg"
     [ngClass]="{
       'bg-green-100 border-2 border-green-500 text-green-800': esGanador,
-      'bg-red-100 border-2 border-red-500 text-red-800': !esGanador
+      'bg-red-100 border-2 border-red-500 text-red-800': jugadorEliminado,
+      'bg-yellow-100 border-2 border-yellow-500 text-yellow-800': !esGanador && !jugadorEliminado
     }"
   >
     {{ mensajeResultado }}
+    <div *ngIf="jugadorEliminado && cartasNoGritadas.length > 0" class="mt-2 text-sm">
+      <p>Cartas que no habían sido gritadas:</p>
+      <p class="font-mono">{{ cartasNoGritadas.join(', ') }}</p>
+    </div>
   </div>
 
   <div class="flex gap-4 max-w-md mx-auto">
@@ -58,12 +64,31 @@
     Fichas colocadas: {{ posicionesMarcadas.length }}/{{ maxFichas }}
   </div>
 
-  <div>
+  <!-- Botón Lotería -->
+  <div class="mt-6 text-center" *ngIf="!jugadorEliminado && !esGanador">
+    <button
+      [disabled]="!puedeCrearLoteria"
+      [ngClass]="{
+        'bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-3 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 animate-pulse': puedeCrearLoteria,
+        'bg-gray-400 text-gray-600 font-medium py-3 px-6 rounded-lg cursor-not-allowed': !puedeCrearLoteria
+      }"
+      (click)="cantarLoteria()"
+    >
+      {{ puedeCrearLoteria ? '🎯 ¡LOTERÍA!' : 'Completa tu cartón para cantar lotería' }}
+    </button>
+    <p class="text-xs text-gray-500 mt-2" *ngIf="puedeCrearLoteria">
+      ⚠️ Solo puedes cantar lotería si todas tus cartas han sido gritadas
+    </p>
+  </div>
+
+  <!-- Botones de acción -->
+  <div class="mt-6 text-center space-x-4">
     <button
       class="bg-red-500 hover:bg-red-600 disabled:bg-gray-400 text-white font-medium py-2 px-4 rounded-lg transition-all duration-200 transform hover:scale-105 disabled:transform-none"
+      [disabled]="esGanador"
       (click)="abandonarPartida()"
     >
-      Abandonar Partida
+      {{ esGanador ? 'Partida Terminada' : 'Abandonar Partida' }}
     </button>
   </div>
 </div>

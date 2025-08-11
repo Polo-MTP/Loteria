@@ -240,4 +240,19 @@ export class PartidaService {
         })
       );
   }
+
+  cantarLoteria(partidaId: number): Observable<any> {
+    if (!partidaId || isNaN(partidaId)) {
+      return throwError(() => new Error('ID de partida inválido'));
+    }
+
+    return this.http
+      .post<any>(`${this.apiUrl}/juego/${partidaId}/cantar-loteria`, {})
+      .pipe(
+        catchError((error) => {
+          console.error('Error al cantar lotería:', error);
+          return throwError(() => error);
+        })
+      );
+  }
 }

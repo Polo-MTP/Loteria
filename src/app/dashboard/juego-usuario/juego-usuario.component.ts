@@ -16,13 +16,15 @@ export class JuegoUsuarioComponent implements OnInit, OnDestroy {
   pollingSubscription!: Subscription;
   ultimaCarta: number | null = null;
 
-
   partidaId!: number;
   carta: number[] = [];
   posicionesMarcadas: number[] = [];
   maxFichas: number = 16;
   esGanador: boolean = false;
   mensajeResultado: string = '';
+  jugadorEliminado: boolean = false;
+  cartasNoGritadas: number[] = [];
+  puedeJugar: boolean = true;
 
   constructor(
     private router: Router,
@@ -125,6 +127,11 @@ export class JuegoUsuarioComponent implements OnInit, OnDestroy {
   }
 
   colocarFicha(posicion: number): void {
+    if (!this.puedeJugar) {
+      alert('Ya fuiste eliminado de esta partida');
+      return;
+    }
+
     if (this.posicionesMarcadas.includes(posicion)) return;
 
     if (this.posicionesMarcadas.length >= this.maxFichas) return;
@@ -132,14 +139,16 @@ export class JuegoUsuarioComponent implements OnInit, OnDestroy {
     this.partidaService.colocarFicha(this.partidaId, posicion).subscribe({
       next: (response) => {
         this.posicionesMarcadas = response.fichas; // Usar la respuesta del servidor
-
-        if (this.posicionesMarcadas.length === this.maxFichas) {
-          this.validarCarta();
-        }
       },
       error: (error) => {
         console.error('Error al colocar ficha:', error);
-        alert('No puedes colocar ficha en esa posición. La carta no ha sido gritada.');
+        if (error.error && error.error.message === 'Ya fuiste eliminado de esta partida y no puedes colocar más fichas') {
+          this.jugadorEliminado = true;
+          this.puedeJugar = false;
+          this.mensajeResultado = 'Perdiste - Esperando a los demás jugadores';
+        } else {
+          alert(error.error?.message || 'Error al colocar ficha');
+        }
       },
     });
   }
@@ -190,6 +199,49 @@ export class JuegoUsuarioComponent implements OnInit, OnDestroy {
     const target = event.target as HTMLImageElement;
     if (target) {
       target.src = 'cartas/default.png';
+    }
+  }
+
+  get puedeCrearLoteria(): boolean {
+    return this.posicionesMarcadas.length === 16 && this.puedeJugar && !this.esGanador;
+  }
+
+  cantarLoteria(): void {
+    if (!this.puedeCrearLoteria) {
+      alert('Debes tener las 16 fichas colocadas para cantar lotería');
+      return;
+    }
+
+    if (confirm('¿Estás seguro de que quieres cantar LOTERÍA? Si no tienes todas las cartas correctas, serás eliminado.')) {
+      this.partidaService.cantarLoteria(this.partidaId).subscribe({
+        next: (response) => {
+          if (response.ganador) {
+            this.esGanador = true;
+            this.mensajeResultado = response.message || '¡LOTERÍA! ¡Has ganado!';
+            this.puedeJugar = false;
+            
+            // Detener polling
+            if (this.pollingSubscription) {
+              this.pollingSubscription.unsubscribe();
+            }
+            
+            setTimeout(() => {
+              alert(this.mensajeResultado);
+              this.router.navigate(['/app/home']);
+            }, 2000);
+            
+          } else if (response.eliminado) {
+            this.jugadorEliminado = true;
+            this.puedeJugar = false;
+            this.mensajeResultado = response.message || 'Perdiste - Esperando a los demás jugadores';
+            this.cartasNoGritadas = response.cartasNoGritadas || [];
+          }
+        },
+        error: (error) => {
+          console.error('Error al cantar lotería:', error);
+          alert(error.error?.message || 'Error al cantar lotería');
+        },
+      });
     }
   }
 }
