@@ -270,6 +270,21 @@ export class PartidaService {
         })
       );
   }
+  
+  finalizarPartidaPorAnfitrionSolo(partidaId: number): Observable<any> {
+    if (!partidaId || isNaN(partidaId)) {
+      return throwError(() => new Error('ID de partida inválido'));
+    }
+
+    return this.http
+      .post<any>(`${this.apiUrl}/partida/${partidaId}/finalizar-por-anfitrion-solo`, {})
+      .pipe(
+        catchError((error) => {
+          console.error('Error al finalizar partida por anfitrión solo:', error);
+          return throwError(() => error);
+        })
+      );
+  }
 
   quitarFicha(partidaId: number, posicion: number): Observable<any> {
     if (!partidaId || isNaN(partidaId)) {

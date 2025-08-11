@@ -34,6 +34,12 @@ export interface PartidaAnfitrion {
   maxJugadores: number;
   cartaActual: any;
   cartasGritadas: any[];
+  cartas_gritadas?: any[]; // Campo alternativo del backend
+  cartaActualVisible?: number; // Campo para mantener la carta visible
+  anfitrionSolo?: boolean; // Flag para indicar si el anfitrión está solo
+  deberiaFinalizarse?: boolean; // Flag para sugerir finalizar partida
+  totalCartasGritadas?: number;
+  cartasRestantes?: number;
   createdAt: string;
   updatedAt: string;
   anfitrion: Anfitrion;

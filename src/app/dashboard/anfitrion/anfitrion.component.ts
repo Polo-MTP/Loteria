@@ -20,6 +20,8 @@ export class AnfitrionComponent implements OnInit, OnDestroy {
   cartaActual: number = 0;
   isLoading: boolean = false;
   errorMsg = '';
+  anfitrionSolo: boolean = false;
+  deberiaFinalizarse: boolean = false;
 
   pollingSubscription?: Subscription;
 
@@ -63,8 +65,16 @@ export class AnfitrionComponent implements OnInit, OnDestroy {
           })) || []
         };
         
-        this.cartasGritadas = response.partida.cartasGritadas || [];
-        this.cartaActual = response.partida.cartaActual ?? 0;
+        this.cartasGritadas = response.partida.cartas_gritadas || [];
+        
+        // Solo actualizar la carta si el backend devuelve una carta válida y diferente
+        if (response.partida.cartaActualVisible && response.partida.cartaActualVisible !== this.cartaActual) {
+          this.cartaActual = response.partida.cartaActualVisible;
+        }
+        
+        // Detectar si el anfitrión está solo
+        this.anfitrionSolo = response.partida.anfitrionSolo || false;
+        this.deberiaFinalizarse = response.partida.deberiaFinalizarse || false;
 
         this.mazoRestante = this.generarMazoRestante();
         this.isLoading = false;
@@ -169,5 +179,24 @@ export class AnfitrionComponent implements OnInit, OnDestroy {
         console.error('Error al finalizar partida:', error);
       }
     });
+  }
+  
+  finalizarPartidaPorAnfitrionSolo(): void {
+    if (confirm('¿Estás seguro de que quieres finalizar la partida? Te quedaste sin jugadores.')) {
+      this.partidaService.finalizarPartidaPorAnfitrionSolo(this.partidaId).subscribe({
+        next: (response: any) => {
+          if (this.pollingSubscription) {
+            this.pollingSubscription.unsubscribe();
+          }
+          
+          alert('Partida finalizada - Te quedaste sin jugadores');
+          this.router.navigate(['/app/home']);
+        },
+        error: (error: any) => {
+          console.error('Error al finalizar partida:', error);
+          alert('Error al finalizar la partida');
+        }
+      });
+    }
   }
 }
