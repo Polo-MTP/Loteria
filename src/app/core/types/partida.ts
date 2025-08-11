@@ -141,5 +141,7 @@ export interface ultimosDatosResponse {
 export interface salirPartidaResponse {
   message: string;
   abandonoVoluntario?: boolean;
+  partidaFinalizada?: boolean;
+  sinGanador?: boolean;
 }
 
